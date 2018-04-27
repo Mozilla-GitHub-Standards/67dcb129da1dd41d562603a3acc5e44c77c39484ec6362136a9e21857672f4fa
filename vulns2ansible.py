@@ -32,9 +32,10 @@ def gen_cmds(pkgs2hosts, args):
     cmds = []
     for pkgs, hosts in pkgs2hosts.items():
         name = pkgs.replace(' ', '-') + '.hosts'
+        yum = "sudo /usr/local/sbin/yum-wrapper update -y {pkgs}".format(**locals())
         with open(name, 'w') as f:
             f.write('\n'.join(hosts)+'\n')
-        cmds += ["ansible -i {name} -a 'sudo yum-wrapper update -y {pkgs}' {args}".format(**locals())]
+        cmds += ["ansible -i {name} {args} -a '{yum}'".format(**locals())]
     return cmds
 
 def v2a(vulns, args):
@@ -52,4 +53,4 @@ if __name__ == '__main__':
         raise InventorySpecifiedError
     elif '-a' in args:
         raise ModuleArgsSpecifiedError
-    v2a(vulns, '\n'.join(args))
+    v2a(vulns, ' '.join(args))
